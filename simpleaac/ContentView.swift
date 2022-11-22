@@ -16,12 +16,59 @@ struct ContentView: View {
     let synth = AVSpeechSynthesizer()
     @ObservedObject var synthDelegate = SpeechSynthDelegate()
     
-    let voices: [AVSpeechSynthesisVoice]
+    let voices: [VoiceWrapper]
     @State var selectedVoiceIdx: Int = 0
     
     init() {
-        voices = AVSpeechSynthesisVoice.speechVoices()
+        voices = Self.groupAndLabelVoices()
+        
         synth.delegate = synthDelegate
+    }
+    
+    static func groupAndLabelVoices() -> [VoiceWrapper] {
+        let rawVoices = AVSpeechSynthesisVoice.speechVoices()
+        
+        var groups: [String: [String: [AVSpeechSynthesisVoice]]] = [:]
+        
+        for voice in rawVoices {
+            let locale = Locale(identifier: voice.language)
+            
+            let languageName = locale.localizedString(forLanguageCode: voice.language) ?? ""
+            let regionName = locale.regionCode == nil ? "" : (locale.localizedString(forRegionCode: locale.regionCode!) ?? "")
+            
+            if groups[languageName] == nil {
+                groups[languageName] = [:]
+            }
+            
+            if groups[languageName]![regionName] == nil {
+                groups[languageName]![regionName] = []
+            }
+            groups[languageName]![regionName]!.append(voice)
+        }
+        
+        var finalOrdered: [VoiceWrapper] = []
+        
+        let sortedGroups = groups.sorted(by: { a, b in a.key < b.key })
+        
+        for (languageName, subgroups) in sortedGroups {
+            let addRegionName = subgroups.count > 1
+            
+            let sortedSubgroups = subgroups.sorted(by: { a, b in a.key < b.key })
+            
+            for (regionName, voices) in sortedSubgroups {
+                let prettyLangName = addRegionName ? (
+                    languageName + " (" + regionName + ")"
+                ) : languageName
+                
+                let sortedVoices = voices.sorted(by: { a, b in a.name < b.name })
+                
+                for voice in sortedVoices {
+                    finalOrdered.append(VoiceWrapper(voice: voice, languageName: prettyLangName))
+                }
+            }
+        }
+        
+        return finalOrdered
     }
     
     var body: some View {
@@ -29,7 +76,7 @@ struct ContentView: View {
             HStack {
                 Picker("Select Voice", selection: $selectedVoiceIdx) {
                     ForEach(Array(voices.enumerated()), id: \.offset) { index, voice in
-                        Text(voice.name + " (" + voice.language + ")")
+                        Text(voice.prettyName)
                     }
                 }.pickerStyle(.menu)
                 
@@ -41,7 +88,7 @@ struct ContentView: View {
                     } else {
                         let u = AVSpeechUtterance(string: currentText)
                         
-                        u.voice = voices[selectedVoiceIdx]
+                        u.voice = voices[selectedVoiceIdx].voice
                         
                         synth.speak(u)
                     }
@@ -58,8 +105,6 @@ struct ContentView: View {
                         
                         let _ = highlightedText[lower...upper].backgroundColor = .yellow
                     }
-                    
-//                    let _ = highlightedText.foregroundColor = UIColor.red
                         
                     Text(highlightedText)
                         .font(.custom("Helvetica", size: 50))
@@ -102,6 +147,17 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+    }
+}
+
+struct VoiceWrapper {
+    let voice: AVSpeechSynthesisVoice
+    let languageName: String
+    
+    var prettyName: String {
+        get {
+            voice.name + " (" + languageName + ")"
+        }
     }
 }
 
