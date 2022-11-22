@@ -80,10 +80,14 @@ struct ContentView: View {
                 }
                 
                 if currentText.isEmpty {
-                    Text("(enter text here)")
-                        .font(.custom("Helvetica", size: 40))
-                        .padding(.top, 30)
+                    Text("(type here)")
+                        .font(.custom("Helvetica", size: 50))
+                        .padding(.top, 24)
                         .padding(.leading, 21)
+                        .padding(.trailing, 21)
+                        .frame(maxWidth: .infinity,
+                               maxHeight: .infinity,
+                               alignment: .topLeading)
                         .opacity(0.3)
                         .onTapGesture {
                             textInFocus = true
