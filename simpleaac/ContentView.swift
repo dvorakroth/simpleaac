@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import AVFoundation
+import Introspect
 
 struct VoiceIndex: Hashable, Equatable {
     var _0: Int
@@ -56,6 +57,10 @@ struct ContentView: View {
             voiceGroups[selectedVoiceIdx._0].1[selectedVoiceIdx._1]
         }
     }
+    
+    @State var currentSpeakingScrollPosition: CGRect? = nil
+    
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
     
     init() {
         voiceGroups = Self.groupAndLabelVoices()
@@ -233,30 +238,23 @@ struct ContentView: View {
                 }
             }
             
+            var highlightedText: AttributedString? = nil
+            
+            if synthDelegate.isSpeaking {
+                let _ = (highlightedText = AttributedString(stringLiteral: currentText))
+
+                if let r = synthDelegate.speakingRange {
+                    // what. the. eff. apple. why is it so bureaucratically intensive to get a range of an attributed string,,,,,,
+                    let lower = highlightedText!.index(highlightedText!.startIndex, offsetByCharacters: r.lowerBound)
+                    let upper = highlightedText!.index(highlightedText!.startIndex, offsetByCharacters: r.upperBound - 1)
+
+                    let _ = highlightedText![lower...upper].backgroundColor = .yellow
+                }
+            }
+            
             let isRtl = Locale.characterDirection(forLanguage: selectedVoice.language) == .rightToLeft
             
             ZStack(alignment: .topLeading) {
-                if synthDelegate.isSpeaking {
-                    var highlightedText = AttributedString(stringLiteral: currentText)
-                    
-                    if let r = synthDelegate.speakingRange {
-                        // what. the. eff. apple. why is it so bureaucratically intensive to get a range of an attributed string,,,,,,
-                        let lower = highlightedText.index(highlightedText.startIndex, offsetByCharacters: r.lowerBound)
-                        let upper = highlightedText.index(highlightedText.startIndex, offsetByCharacters: r.upperBound - 1)
-                        
-                        let _ = highlightedText[lower...upper].backgroundColor = .yellow
-                    }
-                        
-                    Text(highlightedText)
-                        .font(.custom("Helvetica", size: 50))
-                        .padding(.top, 24)
-                        .padding(.leading, 21)
-                        .padding(.trailing, 21)
-                        .frame(maxWidth: .infinity,
-                               maxHeight: .infinity,
-                               alignment: .topLeading)
-                }
-                
                 TextEditor(text: $currentText)
                     .focused($textInFocus)
                     .disabled(synthDelegate.isSpeaking)
@@ -265,6 +263,35 @@ struct ContentView: View {
                     .frame(maxWidth: .infinity,
                            maxHeight: .infinity,
                            alignment: .topLeading)
+                    .introspectTextView(customize: { uiTextView in
+                        if synthDelegate.isSpeaking {
+                            if let r = synthDelegate.speakingRange {
+                                // aaaaallllllllll of this:
+                                let pos1 = uiTextView.position(from: uiTextView.beginningOfDocument, offset: r.lowerBound)
+                                let pos2 = uiTextView.position(from: uiTextView.beginningOfDocument, offset: r.upperBound - 1)
+                                
+                                guard let pos1 = pos1, let pos2 = pos2 else { return; }
+                                
+                                let range = uiTextView.textRange(from: pos1, to: pos2)
+                                guard let range = range else { return; }
+                                
+                                let rect1 = uiTextView.firstRect(for: range)
+                                // ^^^^^^^ up to here,
+                                // is just apple's way of saying: "get me the first CGRect for enclosing all of the characters in range r"
+                                
+                                let visibleBounds = CGRect(origin: uiTextView.contentOffset, size: uiTextView.bounds.size)
+                                if (rect1.maxY >= visibleBounds.maxY || rect1.maxY <= visibleBounds.minY) {
+                                    currentSpeakingScrollPosition = CGRect(origin: rect1.origin, size: visibleBounds.size)
+                                    uiTextView.scrollRectToVisible(currentSpeakingScrollPosition!, animated: false)
+                                }
+                            }
+                        } else {
+                            if currentSpeakingScrollPosition != nil {
+                                // haha imperative code go brrrrr
+                                currentSpeakingScrollPosition = nil
+                            }
+                        }
+                    })
                     .toolbar {
                         ToolbarItem(placement: .keyboard) {
                             Button(action: { Self.dismissKeyboard() }) {
@@ -272,6 +299,33 @@ struct ContentView: View {
                             }
                         }
                     }
+                
+                if synthDelegate.isSpeaking {
+                    weak var scrollViewRef: UIScrollView? = nil
+                    let paddingTop = 19.0
+                
+                    ScrollView(.vertical) {
+                        Text(highlightedText!)
+                            .font(.custom("Helvetica", size: 50))
+                            .padding(.top, paddingTop)
+                            .padding(.leading, 21)
+                            .padding(.trailing, 21)
+                            .frame(maxWidth: .infinity,
+                                   maxHeight: .infinity,
+                                   alignment: .topLeading)
+                    }
+                        .background(.black)
+                        .introspectScrollView(customize: { uiScrollView in
+                            scrollViewRef = uiScrollView // haha reactjs lol
+                        })
+                        .onChange(of: currentSpeakingScrollPosition, perform: { newValue in
+                            if var newValue = newValue {
+                                newValue.origin.y += paddingTop + 6 // upside down smiley face this is fine dot jpeg
+                                scrollViewRef?.scrollRectToVisible(newValue, animated: !reduceMotion)
+                            }
+                        })
+                }
+                
                 
                 if currentText.isEmpty {
                     Text("type here")
@@ -313,13 +367,6 @@ struct VoiceWrapper {
 class SpeechSynthDelegate: NSObject, AVSpeechSynthesizerDelegate, ObservableObject {
     @Published var speakingRange: NSRange? = nil
     @Published var isSpeaking: Bool = false
-    
-//    init() {}
-    
-//    init(speakingRange: Binding<NSRange?>, isSpeaking: Binding<Bool>) {
-//        _speakingRange = speakingRange;
-//        _isSpeaking = isSpeaking;
-//    }
     
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, willSpeakRangeOfSpeechString characterRange: NSRange, utterance: AVSpeechUtterance) {
         speakingRange = characterRange

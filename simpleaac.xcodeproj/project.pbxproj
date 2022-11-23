@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		66A4B43E292DB0B3004C1B43 /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = 66A4B43D292DB0B3004C1B43 /* Introspect */; };
 		66C78893292D234C00550398 /* simpleaacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C78892292D234C00550398 /* simpleaacApp.swift */; };
 		66C78895292D234C00550398 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C78894292D234C00550398 /* ContentView.swift */; };
 		66C78897292D234E00550398 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66C78896292D234E00550398 /* Assets.xcassets */; };
@@ -26,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66A4B43E292DB0B3004C1B43 /* Introspect in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,6 +85,9 @@
 			dependencies = (
 			);
 			name = simpleaac;
+			packageProductDependencies = (
+				66A4B43D292DB0B3004C1B43 /* Introspect */,
+			);
 			productName = simpleaac;
 			productReference = 66C7888F292D234C00550398 /* simpleaac.app */;
 			productType = "com.apple.product-type.application";
@@ -111,6 +116,9 @@
 				Base,
 			);
 			mainGroup = 66C78886292D234C00550398;
+			packageReferences = (
+				66A4B43C292DB0B3004C1B43 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
+			);
 			productRefGroup = 66C78890292D234C00550398 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -343,6 +351,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		66A4B43C292DB0B3004C1B43 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/siteline/SwiftUI-Introspect.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		66A4B43D292DB0B3004C1B43 /* Introspect */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 66A4B43C292DB0B3004C1B43 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
+			productName = Introspect;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 66C78887292D234C00550398 /* Project object */;
 }
