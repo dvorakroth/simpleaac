@@ -77,7 +77,7 @@ struct ContentView: View {
             try AVAudioSession.sharedInstance().setActive(active)
         }
         catch let error as NSError {
-            print("Error: Could not setActive to true: \(error), \(error.userInfo)")
+            print("Error: Could not setActive to \(active): \(error), \(error.userInfo)")
         }
     }
     
@@ -222,7 +222,6 @@ struct ContentView: View {
                 Button(buttonTitle) {
                     if synthDelegate.isSpeaking {
                         synth.stopSpeaking(at: .immediate)
-                        Self.setAudioSessionActive(false)
                     } else {
                         Self.dismissKeyboard()
                         
@@ -338,14 +337,26 @@ class SpeechSynthDelegate: NSObject, AVSpeechSynthesizerDelegate, ObservableObje
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
         isSpeaking = false
         speakingRange = nil
+        
+        deferDeactiveAudioSession()
     }
     
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
         isSpeaking = false
         speakingRange = nil
+        
+        deferDeactiveAudioSession()
     }
     
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didContinue utterance: AVSpeechUtterance) {
         isSpeaking = true
+    }
+    
+    func deferDeactiveAudioSession() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            if self != nil && !self!.isSpeaking {
+                ContentView.setAudioSessionActive(false)
+            }
+        }
     }
 }
