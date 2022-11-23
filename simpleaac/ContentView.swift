@@ -9,6 +9,38 @@ import Foundation
 import SwiftUI
 import AVFoundation
 
+struct VoiceIndex: Hashable, Equatable {
+    var _0: Int
+    var _1: Int
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(self._0)
+        hasher.combine(self._1)
+    }
+    
+    static func ==(lhs: VoiceIndex, rhs: VoiceIndex) -> Bool {
+        return lhs._0 == rhs._0 && lhs._1 == rhs._1
+    }
+}
+
+enum VoiceListEntry: Hashable {
+    case group(name: String, defaultVoiceIdx: VoiceIndex)
+    case voice(voice: AVSpeechSynthesisVoice, idx: VoiceIndex)
+    
+    func hash(into hasher: inout Hasher) {
+        switch(self) {
+        case let .group(name: name, defaultVoiceIdx: defaultVoiceIdx):
+            hasher.combine(0)
+            hasher.combine(name)
+            hasher.combine(defaultVoiceIdx)
+        case let .voice(voice: voice, idx: idx):
+            hasher.combine(1)
+            hasher.combine(voice.name)
+            hasher.combine(idx)
+        }
+    }
+}
+
 struct ContentView: View {
     @State var currentText: String = ""
     @FocusState var textInFocus: Bool
@@ -16,16 +48,39 @@ struct ContentView: View {
     let synth = AVSpeechSynthesizer()
     @ObservedObject var synthDelegate = SpeechSynthDelegate()
     
-    let voices: [VoiceWrapper]
-    @State var selectedVoiceIdx: Int = 0
+    let voiceGroups: [(String, [AVSpeechSynthesisVoice])]
+    let voiceGroupsFlat: [VoiceListEntry]
+    @State var selectedVoiceIdx: VoiceIndex
+    var selectedVoice: AVSpeechSynthesisVoice {
+        get {
+            voiceGroups[selectedVoiceIdx._0].1[selectedVoiceIdx._1]
+        }
+    }
     
     init() {
-        voices = Self.groupAndLabelVoices()
+        voiceGroups = Self.groupAndLabelVoices()
+        voiceGroupsFlat = Self.flattenVoiceGroups(voiceGroups)
+        selectedVoiceIdx = VoiceIndex(_0: 0, _1: 0)
         
         synth.delegate = synthDelegate
     }
     
-    static func groupAndLabelVoices() -> [VoiceWrapper] {
+    static func flattenVoiceGroups(_ voiceGroups: [(String, [AVSpeechSynthesisVoice])]) -> [VoiceListEntry] {
+        // (sigh)
+        var result: [VoiceListEntry] = []
+        
+        for (groupIdx, (groupName, voices)) in voiceGroups.enumerated() {
+            result.append(.group(name: groupName, defaultVoiceIdx: VoiceIndex(_0: groupIdx, _1: 0)))
+            
+            for (voiceIdx, voice) in voices.enumerated() {
+                result.append(.voice(voice: voice, idx: VoiceIndex(_0: groupIdx, _1: voiceIdx)))
+            }
+        }
+        
+        return result
+    }
+    
+    static func groupAndLabelVoices() -> [(String, [AVSpeechSynthesisVoice])] {
         let rawVoices = AVSpeechSynthesisVoice.speechVoices()
         
         var groups: [String: [String: [AVSpeechSynthesisVoice]]] = [:]
@@ -46,7 +101,7 @@ struct ContentView: View {
             groups[languageName]![regionName]!.append(voice)
         }
         
-        var finalOrdered: [VoiceWrapper] = []
+        var finalOrdered: [(String, [AVSpeechSynthesisVoice])] = []
         
         let sortedGroups = groups.sorted(by: { a, b in a.key < b.key })
         
@@ -62,9 +117,7 @@ struct ContentView: View {
                 
                 let sortedVoices = voices.sorted(by: { a, b in a.name < b.name })
                 
-                for voice in sortedVoices {
-                    finalOrdered.append(VoiceWrapper(voice: voice, languageName: prettyLangName))
-                }
+                finalOrdered.append((prettyLangName, sortedVoices))
             }
         }
         
@@ -74,9 +127,24 @@ struct ContentView: View {
     var body: some View {
         VStack {
             HStack {
-                Picker("Select Voice", selection: $selectedVoiceIdx) {
-                    ForEach(Array(voices.enumerated()), id: \.offset) { index, voice in
-                        Text(voice.prettyName)
+                let pickerBinding = Binding<VoiceListEntry>(get: {
+                    .voice(voice: selectedVoice, idx: selectedVoiceIdx)
+                }) {
+                    switch $0 {
+                    case let .voice(voice: _, idx: idx):
+                        self.selectedVoiceIdx = idx
+                    case let .group(name: _, defaultVoiceIdx: idx):
+                        self.selectedVoiceIdx = idx
+                    }
+                }
+                Picker("Select Voice", selection: pickerBinding) {
+                    ForEach(voiceGroupsFlat, id: \.self) {
+                        switch $0 {
+                        case let .group(name: name, defaultVoiceIdx: _):
+                            Text("--" + name + "--").foregroundColor(.gray) // (sigh)
+                        case let .voice(voice: voice, idx: _):
+                            Text(voice.name)
+                        }
                     }
                 }.pickerStyle(.menu)
                 
@@ -87,9 +155,7 @@ struct ContentView: View {
                         synth.stopSpeaking(at: .immediate)
                     } else {
                         let u = AVSpeechUtterance(string: currentText)
-                        
-                        u.voice = voices[selectedVoiceIdx].voice
-                        
+                        u.voice = selectedVoice
                         synth.speak(u)
                     }
                 }
@@ -125,7 +191,7 @@ struct ContentView: View {
                 }
                 
                 if currentText.isEmpty {
-                    Text("(type here)")
+                    Text("type here")
                         .font(.custom("Helvetica", size: 50))
                         .padding(.top, 24)
                         .padding(.leading, 21)
