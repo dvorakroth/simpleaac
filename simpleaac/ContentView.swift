@@ -63,6 +63,22 @@ struct ContentView: View {
         selectedVoiceIdx = Self.readSelectedVoice(voiceGroups: voiceGroups) ?? VoiceIndex(_0: 0, _1: 0)
         
         synth.delegate = synthDelegate
+        
+        do {
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)
+        }
+        catch let error as NSError {
+            print("Error: Could not set audio category: \(error), \(error.userInfo)")
+        }
+    }
+    
+    static func setAudioSessionActive(_ active: Bool) {
+        do {
+            try AVAudioSession.sharedInstance().setActive(active)
+        }
+        catch let error as NSError {
+            print("Error: Could not setActive to true: \(error), \(error.userInfo)")
+        }
     }
     
     static func flattenVoiceGroups(_ voiceGroups: [(String, [AVSpeechSynthesisVoice])]) -> [VoiceListEntry] {
@@ -206,11 +222,13 @@ struct ContentView: View {
                 Button(buttonTitle) {
                     if synthDelegate.isSpeaking {
                         synth.stopSpeaking(at: .immediate)
+                        Self.setAudioSessionActive(false)
                     } else {
                         Self.dismissKeyboard()
                         
                         let u = AVSpeechUtterance(string: currentText)
                         u.voice = selectedVoice
+                        Self.setAudioSessionActive(true)
                         synth.speak(u)
                     }
                 }
