@@ -305,18 +305,19 @@ struct ContentView: View {
                 
                 
                 if currentText.isEmpty {
-                    Text("type here")
-                        .font(.custom("Helvetica", size: 50))
-                        .padding(.top, 24)
-                        .padding(.leading, 21)
-                        .padding(.trailing, 21)
-                        .frame(maxWidth: .infinity,
-                               maxHeight: .infinity,
-                               alignment: .topLeading)
-                        .opacity(0.3)
-                        .onTapGesture {
-                            textInFocus = true
-                        }
+                    ScrollView() {
+                        Text("type here")
+                            .font(.custom("Helvetica", size: 50))
+                            .padding(.top, 24)
+                            .padding(.leading, 21)
+                            .padding(.trailing, 21)
+                            .frame(maxWidth: .infinity,
+                                   maxHeight: .infinity,
+                                   alignment: .topLeading)
+                            .opacity(0.3)
+                    }.introspectScrollView() { uiScrollView in
+                        uiScrollView.isUserInteractionEnabled = false
+                    }
                 }
             }.environment(\.layoutDirection, isRtl ? .rightToLeft : .leftToRight)
         }
