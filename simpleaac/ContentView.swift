@@ -160,6 +160,9 @@ struct ContentView: View {
                     }
                 }
             }
+            
+            let isRtl = Locale.characterDirection(forLanguage: selectedVoice.language) == .rightToLeft
+            
             ZStack(alignment: .topLeading) {
                 if false || synthDelegate.isSpeaking {
                     var highlightedText = AttributedString(stringLiteral: currentText)
@@ -204,7 +207,7 @@ struct ContentView: View {
                             textInFocus = true
                         }
                 }
-            }
+            }.environment(\.layoutDirection, isRtl ? .rightToLeft : .leftToRight)
         }
         .padding()
     }
