@@ -50,13 +50,7 @@ struct ContentView: View {
     @ObservedObject var synthDelegate = SpeechSynthDelegate()
     
     let voiceGroups: [(String, [AVSpeechSynthesisVoice])]
-    let voiceGroupsFlat: [VoiceListEntry]
-    @State var selectedVoiceIdx: VoiceIndex
-    var selectedVoice: AVSpeechSynthesisVoice {
-        get {
-            voiceGroups[selectedVoiceIdx._0].1[selectedVoiceIdx._1]
-        }
-    }
+    @State var selectedVoice: (AVSpeechSynthesisVoice, String)
     
     @State var currentSpeakingScrollPosition: CGRect? = nil
     
@@ -64,8 +58,7 @@ struct ContentView: View {
     
     init() {
         voiceGroups = Self.groupAndLabelVoices()
-        voiceGroupsFlat = Self.flattenVoiceGroups(voiceGroups)
-        selectedVoiceIdx = Self.readSelectedVoice(voiceGroups: voiceGroups) ?? VoiceIndex(_0: 0, _1: 0)
+        selectedVoice = Self.readSelectedVoice(voiceGroups: voiceGroups) ?? (voiceGroups[0].1[0], voiceGroups[0].0)
         
         synth.delegate = synthDelegate
         
@@ -84,21 +77,6 @@ struct ContentView: View {
         catch let error as NSError {
             print("Error: Could not setActive to \(active): \(error), \(error.userInfo)")
         }
-    }
-    
-    static func flattenVoiceGroups(_ voiceGroups: [(String, [AVSpeechSynthesisVoice])]) -> [VoiceListEntry] {
-        // (sigh)
-        var result: [VoiceListEntry] = []
-        
-        for (groupIdx, (groupName, voices)) in voiceGroups.enumerated() {
-            result.append(.group(name: groupName, defaultVoiceIdx: VoiceIndex(_0: groupIdx, _1: 0)))
-            
-            for (voiceIdx, voice) in voices.enumerated() {
-                result.append(.voice(voice: voice, idx: VoiceIndex(_0: groupIdx, _1: voiceIdx)))
-            }
-        }
-        
-        return result
     }
     
     static func groupAndLabelVoices() -> [(String, [AVSpeechSynthesisVoice])] {
@@ -163,7 +141,7 @@ struct ContentView: View {
         }
     }
     
-    static func readSelectedVoice(voiceGroups: [(String, [AVSpeechSynthesisVoice])]) -> VoiceIndex? {
+    static func readSelectedVoice(voiceGroups: [(String, [AVSpeechSynthesisVoice])]) -> (AVSpeechSynthesisVoice, String)? {
         let jsonIn = try? Data(contentsOf: Self.savedVoiceFilename)
         
         guard let jsonIn = jsonIn else { return nil }
@@ -174,22 +152,22 @@ struct ContentView: View {
         guard let voiceName = actualDict["voice"] else { return nil }
         guard let langName  = actualDict["lang"]  else { return nil }
         
-        var bestIndex: VoiceIndex? = nil
+        var bestMatch: (AVSpeechSynthesisVoice, String)? = nil
         
-        for (groupIdx, (_, voices)) in voiceGroups.enumerated() {
-            for (voiceIdx, voice) in voices.enumerated() {
+        for (groupName, voices) in voiceGroups {
+            for voice in voices {
                 if voice.language == langName && voice.name == voiceName {
-                    bestIndex = VoiceIndex(_0: groupIdx, _1: voiceIdx)
+                    bestMatch = (voice: voice, languagePretty: groupName)
                     break // perfect match found! end here
-                } else if bestIndex == nil && voice.language == langName {
+                } else if bestMatch == nil && voice.language == langName {
                     // if it's not the correct voice, but at least the correct language
                     // (but still keep going in case we find the right one)
-                    bestIndex = VoiceIndex(_0: groupIdx, _1: voiceIdx)
+                    bestMatch = (voice: voice, languagePretty: groupName)
                 }
             }
         }
         
-        return bestIndex
+        return bestMatch
     }
     
     static func dismissKeyboard() {
@@ -199,28 +177,27 @@ struct ContentView: View {
     var body: some View {
         VStack {
             HStack {
-                let pickerBinding = Binding<VoiceListEntry>(get: {
-                    .voice(voice: selectedVoice, idx: selectedVoiceIdx)
-                }) {
-                    switch $0 {
-                    case let .voice(voice: _, idx: idx):
-                        self.selectedVoiceIdx = idx
-                    case let .group(name: _, defaultVoiceIdx: idx):
-                        self.selectedVoiceIdx = idx
-                    }
-                    
-                    Self.saveSelectedVoice(selectedVoice)
-                }
-                Picker("Select Voice", selection: pickerBinding) {
-                    ForEach(voiceGroupsFlat, id: \.self) {
-                        switch $0 {
-                        case let .group(name: name, defaultVoiceIdx: _):
-                            Text("--" + name + "--").foregroundColor(.gray) // (sigh)
-                        case let .voice(voice: voice, idx: _):
-                            Text(voice.name)
+                let v = selectedVoice
+                Menu(v.0.name + " (" + v.1 + ")") {
+                    ForEach(Array(voiceGroups.enumerated()), id: \.0) { (groupIdx, g) in
+                        let (groupName, voices) = g
+                        
+                        Menu(groupName) {
+                            ForEach(Array(voices.enumerated()), id: \.0) { (voiceIdx, voice) in
+                                Button() {
+                                    self.selectedVoice = (voice, groupName)
+                                    Self.saveSelectedVoice(voice)
+                                } label: {
+                                    if (self.selectedVoice.0 == voice) {
+                                        Image(systemName: "checkmark")
+                                    }
+                                    
+                                    Text(voice.name)
+                                }
+                            }
                         }
                     }
-                }.pickerStyle(.menu)
+                }
                 
                 let buttonTitle = synthDelegate.isSpeaking ? "❌" : "🔊"
                 
@@ -231,7 +208,7 @@ struct ContentView: View {
                         Self.dismissKeyboard()
                         
                         let u = AVSpeechUtterance(string: currentText)
-                        u.voice = selectedVoice
+                        u.voice = selectedVoice.0
                         Self.setAudioSessionActive(true)
                         synth.speak(u)
                     }
@@ -252,7 +229,7 @@ struct ContentView: View {
                 }
             }
             
-            let isRtl = Locale.characterDirection(forLanguage: selectedVoice.language) == .rightToLeft
+            let isRtl = Locale.characterDirection(forLanguage: selectedVoice.0.language) == .rightToLeft
             
             ZStack(alignment: .topLeading) {
                 TextEditor(text: $currentText)
