@@ -171,6 +171,10 @@ struct ContentView: View {
         return bestIndex
     }
     
+    static func dismissKeyboard() {
+      UIApplication.shared.windows.filter {$0.isKeyWindow}.first?.endEditing(true) // 4
+    }
+    
     var body: some View {
         VStack {
             HStack {
@@ -203,6 +207,8 @@ struct ContentView: View {
                     if synthDelegate.isSpeaking {
                         synth.stopSpeaking(at: .immediate)
                     } else {
+                        Self.dismissKeyboard()
+                        
                         let u = AVSpeechUtterance(string: currentText)
                         u.voice = selectedVoice
                         synth.speak(u)
@@ -213,7 +219,7 @@ struct ContentView: View {
             let isRtl = Locale.characterDirection(forLanguage: selectedVoice.language) == .rightToLeft
             
             ZStack(alignment: .topLeading) {
-                if false || synthDelegate.isSpeaking {
+                if synthDelegate.isSpeaking {
                     var highlightedText = AttributedString(stringLiteral: currentText)
                     
                     if let r = synthDelegate.speakingRange {
@@ -232,15 +238,23 @@ struct ContentView: View {
                         .frame(maxWidth: .infinity,
                                maxHeight: .infinity,
                                alignment: .topLeading)
-                } else {
-                    TextEditor(text: $currentText)
-                        .focused($textInFocus)
-                        .font(.custom("Helvetica", size: 50))
-                        .padding(.all)
-                        .frame(maxWidth: .infinity,
-                               maxHeight: .infinity,
-                               alignment: .topLeading)
                 }
+                
+                TextEditor(text: $currentText)
+                    .focused($textInFocus)
+                    .disabled(synthDelegate.isSpeaking)
+                    .font(.custom("Helvetica", size: 50))
+                    .padding(.all)
+                    .frame(maxWidth: .infinity,
+                           maxHeight: .infinity,
+                           alignment: .topLeading)
+                    .toolbar {
+                        ToolbarItem(placement: .keyboard) {
+                            Button(action: { Self.dismissKeyboard() }) {
+                                Label("", systemImage: "keyboard.chevron.compact.down")
+                            }
+                        }
+                    }
                 
                 if currentText.isEmpty {
                     Text("type here")
