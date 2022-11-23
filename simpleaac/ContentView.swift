@@ -60,7 +60,7 @@ struct ContentView: View {
     init() {
         voiceGroups = Self.groupAndLabelVoices()
         voiceGroupsFlat = Self.flattenVoiceGroups(voiceGroups)
-        selectedVoiceIdx = VoiceIndex(_0: 0, _1: 0)
+        selectedVoiceIdx = Self.readSelectedVoice(voiceGroups: voiceGroups) ?? VoiceIndex(_0: 0, _1: 0)
         
         synth.delegate = synthDelegate
     }
@@ -124,6 +124,53 @@ struct ContentView: View {
         return finalOrdered
     }
     
+    static var savedVoiceFilename: URL {
+        get {
+            let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            return documentDirectory.appendingPathComponent("selectedVoice.json")
+        }
+    }
+    
+    static func saveSelectedVoice(_ selectedVoice: AVSpeechSynthesisVoice) {
+        let jsonOut = try? JSONSerialization.data(withJSONObject: [
+            "voice": selectedVoice.name,
+            "lang": selectedVoice.language
+        ])
+        
+        if jsonOut != nil {
+            try? jsonOut!.write(to: Self.savedVoiceFilename)
+        }
+    }
+    
+    static func readSelectedVoice(voiceGroups: [(String, [AVSpeechSynthesisVoice])]) -> VoiceIndex? {
+        let jsonIn = try? Data(contentsOf: Self.savedVoiceFilename)
+        
+        guard let jsonIn = jsonIn else { return nil }
+        
+        let jsonDict = try? JSONSerialization.jsonObject(with: jsonIn)
+        
+        guard let actualDict = jsonDict as? [String:String] else { return nil }
+        guard let voiceName = actualDict["voice"] else { return nil }
+        guard let langName  = actualDict["lang"]  else { return nil }
+        
+        var bestIndex: VoiceIndex? = nil
+        
+        for (groupIdx, (_, voices)) in voiceGroups.enumerated() {
+            for (voiceIdx, voice) in voices.enumerated() {
+                if voice.language == langName && voice.name == voiceName {
+                    bestIndex = VoiceIndex(_0: groupIdx, _1: voiceIdx)
+                    break // perfect match found! end here
+                } else if bestIndex == nil && voice.language == langName {
+                    // if it's not the correct voice, but at least the correct language
+                    // (but still keep going in case we find the right one)
+                    bestIndex = VoiceIndex(_0: groupIdx, _1: voiceIdx)
+                }
+            }
+        }
+        
+        return bestIndex
+    }
+    
     var body: some View {
         VStack {
             HStack {
@@ -136,6 +183,8 @@ struct ContentView: View {
                     case let .group(name: _, defaultVoiceIdx: idx):
                         self.selectedVoiceIdx = idx
                     }
+                    
+                    Self.saveSelectedVoice(selectedVoice)
                 }
                 Picker("Select Voice", selection: pickerBinding) {
                     ForEach(voiceGroupsFlat, id: \.self) {
