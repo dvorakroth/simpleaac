@@ -19,6 +19,7 @@ struct ContentView: View {
     
     let voiceGroups: [(String, [AVSpeechSynthesisVoice])]
     @State var selectedVoice: (AVSpeechSynthesisVoice, String)
+    @State var isShowingAboutBox = false
     
     @State var currentSpeakingScrollPosition: CGRect? = nil
     
@@ -145,6 +146,14 @@ struct ContentView: View {
     var body: some View {
         VStack {
             HStack {
+                Button() {
+                    isShowingAboutBox.toggle()
+                } label: {
+                    Image(systemName: "questionmark.circle")
+                }.sheet(isPresented: $isShowingAboutBox) {
+                    AboutView(showModal: $isShowingAboutBox)
+                }
+                
                 let v = selectedVoice
                 Menu(v.0.name + " (" + v.1 + ")") {
                     ForEach(Array(voiceGroups.enumerated()), id: \.0) { (groupIdx, g) in
@@ -350,6 +359,55 @@ class SpeechSynthDelegate: NSObject, AVSpeechSynthesizerDelegate, ObservableObje
             if self != nil && !self!.isSpeaking {
                 ContentView.setAudioSessionActive(false)
             }
+        }
+    }
+}
+
+struct AboutView: View {
+    @Binding var showModal: Bool
+    
+    var body: some View {
+        ScrollView(.vertical) {
+            VStack {
+                Button() {
+                    showModal.toggle()
+                } label: {
+                    Image(systemName: "x.square")
+                    Text("Dismiss")
+                }
+                Text("Simple AAC")
+                    .font(.custom("Helvetica", size: 50))
+                    .padding(.bottom, 5)
+                    .lineLimit(1)
+                    .scaledToFit()
+                    .minimumScaleFactor(0.4)
+                Text("Developed as a personal tool by [ish.works](https://ish.works/)")
+                    .padding(.bottom, 20)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Text("Simple AAC is Open Source Software -- all code is in the public domain and available on GitHub")
+                    .padding(.bottom, 20)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Text("Simple AAC also uses SwiftUI-Introspect, which is released under the MIT License, reproduced below:")
+                    .padding(.bottom, 3)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Text(
+"""
+Copyright 2019 Timber Software
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"""
+                )
+                .font(.custom("Helvetica", size: 8))
+                .padding(.leading, 5)
+                .padding(.trailing, 5)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .padding(20)
+            .frame(maxWidth: 500)
         }
     }
 }
