@@ -152,7 +152,7 @@ struct ContentView: View {
                     Image(systemName: "questionmark.circle")
                 }.sheet(isPresented: $isShowingAboutBox) {
                     AboutView(showModal: $isShowingAboutBox)
-                }
+                }.disabled(synthDelegate.isSpeaking)
                 
                 let v = selectedVoice
                 Menu(v.0.name + " (" + v.1 + ")") {
@@ -175,6 +175,7 @@ struct ContentView: View {
                         }
                     }
                 }
+                .disabled(synthDelegate.isSpeaking)
                 
                 let buttonTitle = synthDelegate.isSpeaking ? "❌" : "🔊"
                 
