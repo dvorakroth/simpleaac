@@ -199,8 +199,8 @@ struct ContentView: View {
 
                 if let r = synthDelegate.speakingRange {
                     // what. the. eff. apple. why is it so bureaucratically intensive to get a range of an attributed string,,,,,,
-                    let lower = highlightedText!.index(highlightedText!.startIndex, offsetByCharacters: r.lowerBound)
-                    let upper = highlightedText!.index(highlightedText!.startIndex, offsetByCharacters: r.upperBound - 1)
+                    let lower = highlightedText!.index(highlightedText!.startIndex, offsetByUnicodeScalars: r.lowerBound)
+                    let upper = highlightedText!.index(highlightedText!.startIndex, offsetByUnicodeScalars: r.upperBound - 1)
 
                     let _ = highlightedText![lower...upper].backgroundColor = .yellow
                 }
