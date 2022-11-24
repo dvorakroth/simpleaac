@@ -257,6 +257,8 @@ struct ContentView: View {
                 if synthDelegate.isSpeaking {
                     weak var scrollViewRef: UIScrollView? = nil
                     let paddingTop = 19.0
+                    
+                    // TODO: this is a crummy solution; maybe i should make my own `some View` object function struct thingy that just makes a UITextView with userInteractionEnabled = false?
                 
                     ScrollView(.vertical) {
                         Text(highlightedText!)
