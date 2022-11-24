@@ -186,8 +186,13 @@ struct ContentView: View {
                         
                         let u = AVSpeechUtterance(string: currentText)
                         u.voice = selectedVoice.0
-                        Self.setAudioSessionActive(true)
-                        synth.speak(u)
+                        
+                        synthDelegate.isSpeaking = true // we set this early so that an pending audio session closures won't interfere
+//                        Self.setAudioSessionActive(true)
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                            synth.speak(u)
+                        }
                     }
                 }
             }
