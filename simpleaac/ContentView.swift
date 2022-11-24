@@ -10,38 +10,6 @@ import SwiftUI
 import AVFoundation
 import Introspect
 
-struct VoiceIndex: Hashable, Equatable {
-    var _0: Int
-    var _1: Int
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(self._0)
-        hasher.combine(self._1)
-    }
-    
-    static func ==(lhs: VoiceIndex, rhs: VoiceIndex) -> Bool {
-        return lhs._0 == rhs._0 && lhs._1 == rhs._1
-    }
-}
-
-enum VoiceListEntry: Hashable {
-    case group(name: String, defaultVoiceIdx: VoiceIndex)
-    case voice(voice: AVSpeechSynthesisVoice, idx: VoiceIndex)
-    
-    func hash(into hasher: inout Hasher) {
-        switch(self) {
-        case let .group(name: name, defaultVoiceIdx: defaultVoiceIdx):
-            hasher.combine(0)
-            hasher.combine(name)
-            hasher.combine(defaultVoiceIdx)
-        case let .voice(voice: voice, idx: idx):
-            hasher.combine(1)
-            hasher.combine(voice.name)
-            hasher.combine(idx)
-        }
-    }
-}
-
 struct ContentView: View {
     @State var currentText: String = ""
     @FocusState var textInFocus: Bool
