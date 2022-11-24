@@ -11,7 +11,7 @@ import SwiftUI
 struct simpleaacApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            VoiceManager()
         }
     }
 }

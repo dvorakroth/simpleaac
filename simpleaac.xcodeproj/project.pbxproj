@@ -10,8 +10,9 @@
 		66A4B43E292DB0B3004C1B43 /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = 66A4B43D292DB0B3004C1B43 /* Introspect */; };
 		66A4B440292FC203004C1B43 /* BundleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A4B43F292FC203004C1B43 /* BundleExtension.swift */; };
 		66A4B442292FC288004C1B43 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A4B441292FC288004C1B43 /* AboutView.swift */; };
+		66A4B44429301100004C1B43 /* VoiceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A4B44329301100004C1B43 /* VoiceManager.swift */; };
 		66C78893292D234C00550398 /* simpleaacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C78892292D234C00550398 /* simpleaacApp.swift */; };
-		66C78895292D234C00550398 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C78894292D234C00550398 /* ContentView.swift */; };
+		66C78895292D234C00550398 /* MainSimpleAACView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C78894292D234C00550398 /* MainSimpleAACView.swift */; };
 		66C78897292D234E00550398 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66C78896292D234E00550398 /* Assets.xcassets */; };
 		66C7889A292D234E00550398 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66C78899292D234E00550398 /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
@@ -19,9 +20,10 @@
 /* Begin PBXFileReference section */
 		66A4B43F292FC203004C1B43 /* BundleExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleExtension.swift; sourceTree = "<group>"; };
 		66A4B441292FC288004C1B43 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		66A4B44329301100004C1B43 /* VoiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceManager.swift; sourceTree = "<group>"; };
 		66C7888F292D234C00550398 /* simpleaac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = simpleaac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66C78892292D234C00550398 /* simpleaacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = simpleaacApp.swift; sourceTree = "<group>"; };
-		66C78894292D234C00550398 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		66C78894292D234C00550398 /* MainSimpleAACView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSimpleAACView.swift; sourceTree = "<group>"; };
 		66C78896292D234E00550398 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		66C78899292D234E00550398 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -58,11 +60,12 @@
 			isa = PBXGroup;
 			children = (
 				66C78892292D234C00550398 /* simpleaacApp.swift */,
-				66C78894292D234C00550398 /* ContentView.swift */,
+				66C78894292D234C00550398 /* MainSimpleAACView.swift */,
 				66C78896292D234E00550398 /* Assets.xcassets */,
 				66C78898292D234E00550398 /* Preview Content */,
 				66A4B43F292FC203004C1B43 /* BundleExtension.swift */,
 				66A4B441292FC288004C1B43 /* AboutView.swift */,
+				66A4B44329301100004C1B43 /* VoiceManager.swift */,
 			);
 			path = simpleaac;
 			sourceTree = "<group>";
@@ -152,8 +155,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				66A4B442292FC288004C1B43 /* AboutView.swift in Sources */,
-				66C78895292D234C00550398 /* ContentView.swift in Sources */,
+				66C78895292D234C00550398 /* MainSimpleAACView.swift in Sources */,
 				66C78893292D234C00550398 /* simpleaacApp.swift in Sources */,
+				66A4B44429301100004C1B43 /* VoiceManager.swift in Sources */,
 				66A4B440292FC203004C1B43 /* BundleExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

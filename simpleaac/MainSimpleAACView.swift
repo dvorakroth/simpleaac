@@ -10,7 +10,7 @@ import SwiftUI
 import AVFoundation
 import Introspect
 
-struct ContentView: View {
+struct MainSimpleAACView: View {
     @State var currentText: String = ""
     @FocusState var textInFocus: Bool
     
@@ -25,8 +25,8 @@ struct ContentView: View {
     
     @Environment(\.accessibilityReduceMotion) var reduceMotion
     
-    init() {
-        voiceGroups = Self.groupAndLabelVoices()
+    init(voices rawVoices: [AVSpeechSynthesisVoice]) {
+        voiceGroups = Self.groupAndLabelVoices(rawVoices)
         selectedVoice = Self.readSelectedVoice(voiceGroups: voiceGroups) ?? (voiceGroups[0].1[0], voiceGroups[0].0)
         
         synth.delegate = synthDelegate
@@ -48,9 +48,7 @@ struct ContentView: View {
         }
     }
     
-    static func groupAndLabelVoices() -> [(String, [AVSpeechSynthesisVoice])] {
-        let rawVoices = AVSpeechSynthesisVoice.speechVoices()
-        
+    static func groupAndLabelVoices(_ rawVoices: [AVSpeechSynthesisVoice]) -> [(String, [AVSpeechSynthesisVoice])] {
         var groups: [String: [String: [AVSpeechSynthesisVoice]]] = [:]
         
         for voice in rawVoices {
@@ -312,7 +310,7 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        MainSimpleAACView(voices: AVSpeechSynthesisVoice.speechVoices()) // ugh TODO?
     }
 }
 
@@ -354,7 +352,7 @@ class SpeechSynthDelegate: NSObject, AVSpeechSynthesizerDelegate, ObservableObje
     func deferDeactiveAudioSession() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             if self != nil && !self!.isSpeaking {
-                ContentView.setAudioSessionActive(false)
+                MainSimpleAACView.setAudioSessionActive(false)
             }
         }
     }
