@@ -212,7 +212,7 @@ struct ContentView: View {
                 TextEditor(text: $currentText)
                     .focused($textInFocus)
                     .disabled(synthDelegate.isSpeaking)
-                    .font(.custom("Helvetica", size: 50))
+                    .font(.custom("Helvetica", size: 35))
                     .padding(.all)
                     .frame(maxWidth: .infinity,
                            maxHeight: .infinity,
@@ -256,13 +256,13 @@ struct ContentView: View {
                 
                 if synthDelegate.isSpeaking {
                     weak var scrollViewRef: UIScrollView? = nil
-                    let paddingTop = 19.0
+                    let paddingTop = 24.0
                     
-                    // TODO: this is a crummy solution; maybe i should make my own `some View` object function struct thingy that just makes a UITextView with userInteractionEnabled = false?
+                    // TODO: this is a crummy solution; maybe i should make my own `some View` object function struct thingy that just makes a UITextView with isUserInteractionEnabled = false?
                 
                     ScrollView(.vertical) {
-                        Text(highlightedText!)
-                            .font(.custom("Helvetica", size: 50))
+                        Text(highlightedText ?? AttributedString(currentText))
+                            .font(.custom("Helvetica", size: 35))
                             .padding(.top, paddingTop)
                             .padding(.leading, 21)
                             .padding(.trailing, 21)
@@ -286,7 +286,7 @@ struct ContentView: View {
                 if currentText.isEmpty {
                     ScrollView() {
                         Text("type here")
-                            .font(.custom("Helvetica", size: 50))
+                            .font(.custom("Helvetica", size: 35))
                             .padding(.top, 24)
                             .padding(.leading, 21)
                             .padding(.trailing, 21)
