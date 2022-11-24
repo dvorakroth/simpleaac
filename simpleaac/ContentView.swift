@@ -384,7 +384,7 @@ struct AboutView: View {
                 Text("Developed as a personal tool by [ish.works](https://ish.works/)")
                     .padding(.bottom, 20)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                Text("Simple AAC is Open Source Software -- all code is in the public domain and available on GitHub")
+                Text("Simple AAC is Open Source Software -- all code is in the public domain and [available on GitHub](https://github.com/dvorakroth/simpleaac)")
                     .padding(.bottom, 20)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Text("Simple AAC also uses SwiftUI-Introspect, which is released under the MIT License, reproduced below:")
