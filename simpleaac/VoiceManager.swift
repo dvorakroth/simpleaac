@@ -10,21 +10,25 @@ import SwiftUI
 import AVFoundation
 
 struct VoiceManager: View {
-    @State var voices: [AVSpeechSynthesisVoice]? = nil
+    @State var voicesLoaded = false
+    @State var voices: [AVSpeechSynthesisVoice] = []
+    
     @Environment(\.scenePhase) var scenePhase
     
-    init() {
-        lookForVoices()
-    }
-    
     var body: some View {
-        if (voices?.count ?? 0) > 0 {
-            MainSimpleAACView(voices: voices!)
+        if !voicesLoaded {
+            let _ = DispatchQueue.main.asyncAfter(deadline: .now() + 0.001) {
+                lookForVoices() // i have NO idea why we can't do this in the init() but whatever
+            }
+            
+            VStack {}
+        } else if voices.count > 0 {
+            MainSimpleAACView(voices: voices)
         } else {
             VStack {
                 Text(
 """
-SimpleAAC couldn't find any voices!
+Simple AAC couldn't find any voices!
 
 This could either be because no voices are installed on this device, or because of a random bug.
 
@@ -36,7 +40,7 @@ If it doesn't then,, you've probably found a new bug! 🙃
                     .padding(20)
                     .frame(maxWidth: 1000)
             }.onChange(of: scenePhase) { newScenePhase in
-                if newScenePhase == .active && (voices?.count ?? 0) == 0 {
+                if newScenePhase == .active && voices.count == 0 {
                     lookForVoices()
                 }
             }
@@ -44,8 +48,11 @@ If it doesn't then,, you've probably found a new bug! 🙃
     }
     
     func lookForVoices() {
-        let v = AVSpeechSynthesisVoice.speechVoices()
-        
-        voices = v
+        if (voices.count == 0) {
+            voices.append(contentsOf: AVSpeechSynthesisVoice.speechVoices())
+            if (!voicesLoaded) {
+                voicesLoaded.toggle()
+            }
+        }
     }
 }
