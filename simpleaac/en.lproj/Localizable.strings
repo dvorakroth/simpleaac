@@ -1,0 +1,33 @@
+/* 
+  Localizable.strings
+  simpleaac
+
+  Created by Amit Ron on 25/11/2022.
+  
+*/
+
+"type_here" = "(Type here)";
+"version_%@" = "Version %@";
+"Dismiss" = "Dismiss";
+"about_box_text" = "Developed as a public service by [ish.works](https://ish.works/)
+
+Simple AAC is Open Source Software — all of the code is in the public domain and [available on GitHub](https://github.com/dvorakroth/simpleaac). No information is collected through the app, as detailed in the [privacy policy](https://ish.works/privacy.html/).
+
+Making and publishing Simple AAC (as well as keeping myself alive) requires effort and money, so if you found this app useful, it would be really cool if you could consider [leaving a tip](https://ko-fi.com/ish00). Thank you. 🤟🏻
+
+Trans rights are human rights! 🏳️‍⚧️
+
+Simple AAC also uses SwiftUI-Introspect, which is released under the MIT License, reproduced below:";
+
+
+"no_voices_apology_title" = "Simple AAC couldn't find any voices!";
+"no_voices_apology_text" = "
+This could either be because no voices are installed on this device, or because of a random bug.
+
+To try installing some voices, go into iOS Settings > Accessibility > Spoken Content, and turn on Speak Selection. Then go into the new \"Voices\" menu that should appear underneath, and download some voices. When that's done, try going back into Simple AAC to see if that fixes the problem.
+
+If it doesn't, then congratulations! You might have found a new bug! 🙃
+
+If you're into that sort of thing, you could search the [issues page on GitHub](https://github.com/dvorakroth/simpleaac/issues) to see if anyone else encountered this problem in similar circumstances.
+
+My website is at [ish.works](https://ish.works/), where you can also read the [privacy policy](https://ish.works/privacy.html).";

@@ -30,28 +30,20 @@ struct AboutView: View {
                     .minimumScaleFactor(0.4)
                 
                 let version = Bundle.main.releaseVersionNumber ?? "??"
-                Text("Version \(version)")
+                Text("version_\(version)")
                     .font(.custom("Helvetica", size: 12))
                     .padding(.bottom, 6)
                     .lineLimit(1)
                     .scaledToFit()
                     .minimumScaleFactor(0.4)
                 
-                Text(
-"""
-Developed as a public service by [ish.works](https://ish.works/)
-
-Simple AAC is Open Source Software — all of the code is in the public domain and [available on GitHub](https://github.com/dvorakroth/simpleaac). No information is collected through the app, as detailed in the [privacy policy](https://ish.works/privacy.html/).
-
-Making and publishing Simple AAC (as well as keeping myself alive) requires effort and money, so if you found this app useful, it would be really cool if you could consider [leaving a tip](https://ko-fi.com/ish00). Thank you. 🤟🏻
-
-Trans rights are human rights! 🏳️‍⚧️
-
-Simple AAC also uses SwiftUI-Introspect, which is released under the MIT License, reproduced below:
-"""
-                )
+                Text("about_box_text")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                Text("\nSimple AAC also uses SwiftUI-Introspect, which is released under the MIT License, reproduced below:")
                     .padding(.bottom, 3)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .environment(\.layoutDirection, .leftToRight)
                 Text(
 """
 Copyright 2019 Timber Software
@@ -67,6 +59,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 .padding(.leading, 5)
                 .padding(.trailing, 5)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .environment(\.layoutDirection, .leftToRight)
             }
             .padding(20)
             .frame(maxWidth: 500)

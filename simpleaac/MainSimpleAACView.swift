@@ -289,7 +289,7 @@ struct MainSimpleAACView: View {
                 
                 if currentText.isEmpty {
                     ScrollView() {
-                        Text("type here")
+                        Text("type_here")
                             .font(.custom("Helvetica", size: 35))
                             .padding(.top, 24)
                             .padding(.leading, 21)
