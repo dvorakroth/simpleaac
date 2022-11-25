@@ -41,9 +41,9 @@ struct AboutView: View {
 """
 Developed as a public service by [ish.works](https://ish.works/)
 
-Simple AAC is Open Source Software -- all code is in the public domain and [available on GitHub](https://github.com/dvorakroth/simpleaac)
+Simple AAC is Open Source Software — all of the code is in the public domain and [available on GitHub](https://github.com/dvorakroth/simpleaac). No information is collected through the app, as detailed in the [privacy policy](https://ish.works/privacy.html/).
 
-Making and publishing this app (as well as keeping myself alive) requires effort and money, so if you found this app useful, it would be really cool if you could consider [leaving a tip](https://ko-fi.com/ish00). Thank you. 🤟🏻
+Making and publishing Simple AAC (as well as keeping myself alive) requires effort and money, so if you found this app useful, it would be really cool if you could consider [leaving a tip](https://ko-fi.com/ish00). Thank you. 🤟🏻
 
 Trans rights are human rights! 🏳️‍⚧️
 
