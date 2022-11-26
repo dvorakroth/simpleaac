@@ -7,7 +7,7 @@
 */
 
 "type_here" = "(Type here)";
-"version_%@" = "Version %@";
+"Version %@" = "Version %@";
 "Dismiss" = "Dismiss";
 "about_box_text" = "Developed as a public service by [ish.works](https://ish.works/)
 

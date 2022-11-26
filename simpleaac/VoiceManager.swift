@@ -47,10 +47,10 @@ struct NoVoicesFoundApologyView: View {
     var body: some View {
         ScrollView(.vertical) {
             VStack {
-                Text("no_voices_apology_title")
+                Text("no_voices_apology_title".tryToTranslate().markdownToAttributed())
                     .font(.title)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                Text("no_voices_apology_text")
+                Text("no_voices_apology_text".tryToTranslate().markdownToAttributed())
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }

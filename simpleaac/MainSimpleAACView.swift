@@ -288,8 +288,12 @@ struct MainSimpleAACView: View {
                 
                 
                 if currentText.isEmpty {
+                    let langCodeSpecific = selectedVoice.0.language
+                    let langCodeGeneral = langCodeSpecific.split(separator: "-")[safe: 0]
+                    let finalLangCode = langCodeGeneral == nil ? langCodeSpecific : String(langCodeGeneral!)
+                    
                     ScrollView() {
-                        Text("type_here")
+                        Text("type_here".tryToTranslate(toLanguage: finalLangCode))
                             .font(.custom("Helvetica", size: 35))
                             .padding(.top, 24)
                             .padding(.leading, 21)

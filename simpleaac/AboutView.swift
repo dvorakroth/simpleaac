@@ -30,14 +30,14 @@ struct AboutView: View {
                     .minimumScaleFactor(0.4)
                 
                 let version = Bundle.main.releaseVersionNumber ?? "??"
-                Text("version_\(version)")
+                Text("Version \(version)")
                     .font(.custom("Helvetica", size: 12))
                     .padding(.bottom, 6)
                     .lineLimit(1)
                     .scaledToFit()
                     .minimumScaleFactor(0.4)
                 
-                Text("about_box_text")
+                Text("about_box_text".tryToTranslate().markdownToAttributed())
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
                 Text("\nSimple AAC also uses SwiftUI-Introspect, which is released under the MIT License, reproduced below:")

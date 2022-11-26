@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		660B9ABF2932BFF4006ECE26 /* CollectionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660B9ABE2932BFF4006ECE26 /* CollectionExtension.swift */; };
+		66623A9F2932CE7C0074E457 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66623A9E2932CE7C0074E457 /* StringExtension.swift */; };
 		66A4B43E292DB0B3004C1B43 /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = 66A4B43D292DB0B3004C1B43 /* Introspect */; };
 		66A4B440292FC203004C1B43 /* BundleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A4B43F292FC203004C1B43 /* BundleExtension.swift */; };
 		66A4B442292FC288004C1B43 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A4B441292FC288004C1B43 /* AboutView.swift */; };
@@ -19,6 +21,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		660B9ABE2932BFF4006ECE26 /* CollectionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionExtension.swift; sourceTree = "<group>"; };
+		66623A9E2932CE7C0074E457 /* StringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		66A4B43F292FC203004C1B43 /* BundleExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleExtension.swift; sourceTree = "<group>"; };
 		66A4B441292FC288004C1B43 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		66A4B44329301100004C1B43 /* VoiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceManager.swift; sourceTree = "<group>"; };
@@ -70,6 +74,8 @@
 				66A4B441292FC288004C1B43 /* AboutView.swift */,
 				66A4B44329301100004C1B43 /* VoiceManager.swift */,
 				66EEEF3329315640004DA3AE /* Localizable.strings */,
+				660B9ABE2932BFF4006ECE26 /* CollectionExtension.swift */,
+				66623A9E2932CE7C0074E457 /* StringExtension.swift */,
 			);
 			path = simpleaac;
 			sourceTree = "<group>";
@@ -161,10 +167,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				66A4B442292FC288004C1B43 /* AboutView.swift in Sources */,
+				66623A9F2932CE7C0074E457 /* StringExtension.swift in Sources */,
 				66C78895292D234C00550398 /* MainSimpleAACView.swift in Sources */,
 				66C78893292D234C00550398 /* simpleaacApp.swift in Sources */,
 				66A4B44429301100004C1B43 /* VoiceManager.swift in Sources */,
 				66A4B440292FC203004C1B43 /* BundleExtension.swift in Sources */,
+				660B9ABF2932BFF4006ECE26 /* CollectionExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
