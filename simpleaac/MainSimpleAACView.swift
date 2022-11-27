@@ -274,6 +274,7 @@ struct MainSimpleAACView: View {
                                    maxHeight: .infinity,
                                    alignment: .topLeading)
                     }
+                        .disabled(true)
                         .background(.background)
                         .introspectScrollView(customize: { uiScrollView in
                             scrollViewRef = uiScrollView // haha reactjs lol
