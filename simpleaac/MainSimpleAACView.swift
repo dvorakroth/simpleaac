@@ -201,11 +201,11 @@ struct MainSimpleAACView: View {
             if synthDelegate.isSpeaking {
                 let _ = (highlightedText = AttributedString(stringLiteral: currentText))
 
-                if let r = synthDelegate.speakingRange {
-                    // what. the. eff. apple. why is it so bureaucratically intensive to get a range of an attributed string,,,,,,
-                    let lower = highlightedText!.index(highlightedText!.startIndex, offsetByUnicodeScalars: r.lowerBound)
-                    let upper = highlightedText!.index(highlightedText!.startIndex, offsetByUnicodeScalars: r.upperBound - 1)
-
+                if let (lowerInt, upperInt) = synthDelegate.speakingRange {
+                    // sometimes we get weird NSRanges from the TTS engine upside-down-smiling-face
+                    let lower = highlightedText!.index(highlightedText!.startIndex, offsetByUnicodeScalars: lowerInt)
+                    let upper = highlightedText!.index(highlightedText!.startIndex, offsetByUnicodeScalars: upperInt)
+                    
                     let _ = highlightedText![lower...upper].backgroundColor = .yellow
                 }
             }
@@ -223,10 +223,10 @@ struct MainSimpleAACView: View {
                            alignment: .topLeading)
                     .introspectTextView(customize: { uiTextView in
                         if synthDelegate.isSpeaking {
-                            if let r = synthDelegate.speakingRange {
+                            if let (lowerInt, upperInt) = synthDelegate.speakingRange {
                                 // aaaaallllllllll of this:
-                                let pos1 = uiTextView.position(from: uiTextView.beginningOfDocument, offset: r.lowerBound)
-                                let pos2 = uiTextView.position(from: uiTextView.beginningOfDocument, offset: r.upperBound - 1)
+                                let pos1 = uiTextView.position(from: uiTextView.beginningOfDocument, offset: lowerInt)
+                                let pos2 = uiTextView.position(from: uiTextView.beginningOfDocument, offset: upperInt)
                                 
                                 guard let pos1 = pos1, let pos2 = pos2 else { return; }
                                 
@@ -319,11 +319,17 @@ struct ContentView_Previews: PreviewProvider {
 }
 
 class SpeechSynthDelegate: NSObject, AVSpeechSynthesizerDelegate, ObservableObject {
-    @Published var speakingRange: NSRange? = nil
+    @Published var speakingRange: (Int, Int)? = nil
     @Published var isSpeaking: Bool = false
     
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, willSpeakRangeOfSpeechString characterRange: NSRange, utterance: AVSpeechUtterance) {
-        speakingRange = characterRange
+        let lowerInt = min(utterance.speechString.count - 1, max(0, characterRange.lowerBound))
+        let upperInt = min(utterance.speechString.count - 1, max(0, characterRange.upperBound - 1))
+        
+        speakingRange = (
+            min(lowerInt, upperInt),
+            max(lowerInt, upperInt)
+        )
     }
     
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didStart utterance: AVSpeechUtterance) {
