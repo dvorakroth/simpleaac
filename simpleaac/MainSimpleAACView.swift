@@ -27,7 +27,7 @@ struct MainSimpleAACView: View {
     
     init(voices rawVoices: [AVSpeechSynthesisVoice]) {
         voiceGroups = Self.groupAndLabelVoices(rawVoices)
-        selectedVoice = Self.readSelectedVoice(voiceGroups: voiceGroups) ?? (voiceGroups[0].1[0], voiceGroups[0].0)
+        selectedVoice = Self.readSelectedVoice(voiceGroups: voiceGroups) ?? Self.chooseDefaultVoice(voiceGroups: voiceGroups)
         
         synth.delegate = synthDelegate
         
@@ -135,6 +135,72 @@ struct MainSimpleAACView: View {
         }
         
         return bestMatch
+    }
+    
+    static func chooseDefaultVoice(voiceGroups: [(String, [AVSpeechSynthesisVoice])]) -> (AVSpeechSynthesisVoice, String) {
+        var nonExactGroups: [(String, [AVSpeechSynthesisVoice])] = []
+        
+        let langaugeCode = Locale.current.languageCode
+        let regionCode   = Locale.current.regionCode
+        
+        for (groupName, voices) in voiceGroups {
+            let firstVoice = voices[0]
+            
+            let groupLocale = Locale(identifier: firstVoice.language)
+            
+            if groupLocale.languageCode == langaugeCode {
+                if groupLocale.regionCode == regionCode {
+                    // this is the exact locale we want!
+                    return (getFirstVoiceEnhanced(voices) ?? voices[0], groupName)
+                } else {
+                    nonExactGroups.append((groupName, voices))
+                }
+            }
+        }
+        
+        if nonExactGroups.count > 0 {
+            // we couldn't find a voice group for the exact language+region combination that the user has as their system language
+            // but we DO have a list of groups in their system language but from other regions
+            
+            // so first we rummage through and try to find the first enhanced voice in there
+            for (groupName, voices) in nonExactGroups {
+                if let firstEnhanced = getFirstVoiceEnhanced(voices) {
+                    return (firstEnhanced, groupName)
+                }
+            }
+            
+            // and failing that we just return the first voice from the first group
+            return (nonExactGroups[0].1[0], nonExactGroups[0].0)
+            
+        } else if let defaultVoice = AVSpeechSynthesisVoice.init(language: AVSpeechSynthesisVoice.currentLanguageCode()) ?? AVSpeechSynthesisVoice.init(language: "en-US") {
+            // otherwise try some defaults
+            let voiceLocale = defaultVoice.language
+            let voiceLanguageName = Locale(identifier: voiceLocale).localizedString(forLanguageCode: voiceLocale) ?? voiceLocale
+            return (defaultVoice, voiceLanguageName)
+            
+        } else {
+            // if even that fails,,,,, just pick the first one and hope for the best
+            return (voiceGroups[0].1[0], voiceGroups[0].0)
+        }
+    }
+    
+    static func getFirstVoiceEnhanced(_ voices: [AVSpeechSynthesisVoice]) -> AVSpeechSynthesisVoice? {
+        if #available(iOS 16.0, *) {
+            for v in voices {
+                if v.quality == .enhanced || v.quality == .premium {
+                    return v
+                }
+            }
+        } else {
+            for v in voices {
+                if v.quality == .enhanced {
+                    return v
+                }
+            }
+        }
+        
+        // no enhanced voices found
+        return nil
     }
     
     static func dismissKeyboard() {
