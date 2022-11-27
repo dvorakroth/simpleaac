@@ -324,8 +324,10 @@ class SpeechSynthDelegate: NSObject, AVSpeechSynthesizerDelegate, ObservableObje
     @Published var isSpeaking: Bool = false
     
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, willSpeakRangeOfSpeechString characterRange: NSRange, utterance: AVSpeechUtterance) {
-        let lowerInt = min(utterance.speechString.count - 1, max(0, characterRange.lowerBound))
-        let upperInt = min(utterance.speechString.count - 1, max(0, characterRange.upperBound - 1))
+        let unicodeCount = utterance.speechString.unicodeScalars.count
+        
+        let lowerInt = min(unicodeCount - 1, max(0, characterRange.lowerBound))
+        let upperInt = min(unicodeCount - 1, max(0, characterRange.upperBound - 1))
         
         speakingRange = (
             min(lowerInt, upperInt),
