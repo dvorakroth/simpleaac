@@ -225,7 +225,7 @@ struct MainSimpleAACView: View {
                 }.disabled(synthDelegate.isSpeaking)
                 
                 let v = selectedVoice
-                Menu(v.0.name + " (" + v.1 + ")") {
+                Menu("\(v.1)\n\(v.0.name)") {
                     ForEach(Array(voiceGroups.enumerated()), id: \.0) { (groupIdx, g) in
                         let (groupName, voices) = g
                         
