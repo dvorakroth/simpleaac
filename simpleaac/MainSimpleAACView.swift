@@ -268,7 +268,6 @@ struct MainSimpleAACView: View {
                 let _ = (highlightedText = AttributedString(stringLiteral: currentText))
 
                 if let (lowerInt, upperInt) = synthDelegate.speakingRange {
-                    // sometimes we get weird NSRanges from the TTS engine upside-down-smiling-face
                     let lower = highlightedText!.index(highlightedText!.startIndex, offsetByUnicodeScalars: lowerInt)
                     let upper = highlightedText!.index(highlightedText!.startIndex, offsetByUnicodeScalars: upperInt)
                     
@@ -390,6 +389,7 @@ class SpeechSynthDelegate: NSObject, AVSpeechSynthesizerDelegate, ObservableObje
     @Published var isSpeaking: Bool = false
     
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, willSpeakRangeOfSpeechString characterRange: NSRange, utterance: AVSpeechUtterance) {
+        // sometimes we get weird NSRanges from the TTS engine upside-down-smiling-face
         let unicodeCount = utterance.speechString.unicodeScalars.count
         
         let lowerInt = min(unicodeCount - 1, max(0, characterRange.lowerBound))
