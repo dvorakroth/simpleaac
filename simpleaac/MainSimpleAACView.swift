@@ -100,6 +100,7 @@ struct MainSimpleAACView: View {
     static func saveSelectedVoice(_ selectedVoice: AVSpeechSynthesisVoice) {
         let jsonOut = try? JSONSerialization.data(withJSONObject: [
             "voice": selectedVoice.name,
+            "voiceId": selectedVoice.identifier,
             "lang": selectedVoice.language
         ])
         
@@ -116,14 +117,19 @@ struct MainSimpleAACView: View {
         let jsonDict = try? JSONSerialization.jsonObject(with: jsonIn)
         
         guard let actualDict = jsonDict as? [String:String] else { return nil }
-        guard let voiceName = actualDict["voice"] else { return nil }
+        let voiceName = actualDict["voice"]
+        let voiceId = actualDict["voiceId"]
         guard let langName  = actualDict["lang"]  else { return nil }
+        
+        if voiceName == nil && voiceId == nil {
+            return nil
+        }
         
         var bestMatch: (AVSpeechSynthesisVoice, String)? = nil
         
         for (groupName, voices) in voiceGroups {
             for voice in voices {
-                if voice.language == langName && voice.name == voiceName {
+                if voice.language == langName && (voice.identifier == voiceId || (voiceId == nil && voice.name == voiceName)) {
                     bestMatch = (voice: voice, languagePretty: groupName)
                     break // perfect match found! end here
                 } else if bestMatch == nil && voice.language == langName {
