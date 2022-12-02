@@ -258,7 +258,7 @@ struct MainSimpleAACView: View {
                         let u = AVSpeechUtterance(string: currentText)
                         u.voice = selectedVoice.0
                         
-                        synthDelegate.isSpeaking = true // we set this early so that an pending audio session closures won't interfere
+                        synthDelegate.isSpeaking = true // we set this early so that any pending audio session closures won't interfere
 //                        Self.setAudioSessionActive(true)
                         
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
