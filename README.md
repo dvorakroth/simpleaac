@@ -4,4 +4,4 @@ Extremely simple text-to-speech app using iOS's built-in voices. Text input is d
 
 All source code in this repository is hereby released into the public domain. For more information see COPYING
 
-(App Store link coming soon hopefully!)
+[![Download on the App Store](https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg)](https://apps.apple.com/us/app/simple-aac/id6444707928)
