@@ -210,7 +210,7 @@ struct MainSimpleAACView: View {
     }
     
     static func dismissKeyboard() {
-        UIApplication.shared.windows.filter {$0.isKeyWindow}.first?.endEditing(true) // 4
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
     
     var body: some View {
