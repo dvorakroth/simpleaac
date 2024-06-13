@@ -377,6 +377,7 @@ struct MainSimpleAACView: View {
                     }.introspectScrollView() { uiScrollView in
                         uiScrollView.isUserInteractionEnabled = false
                     }
+                    .allowsHitTesting(false)
                 }
             }.environment(\.layoutDirection, isRtl ? .rightToLeft : .leftToRight)
         }
